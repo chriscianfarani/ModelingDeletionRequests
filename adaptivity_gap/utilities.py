@@ -57,6 +57,6 @@ def adaptive_util(rv, n: int, order: list[int], k: int, t: int) -> float:
 
 def adaptivity_gap(n: int, k: int, p: list[float]) -> float:
     rv = poisson([n*i for i in p])
-    max_nonadaptive: float = max([nonadaptive_util_poisson(rv, n, order, k) for order in permutations(range(3))])
-    max_adaptive: float = max([max([adaptive_util_poisson(rv, n, order, k, t) for t in range(k)]) for order in permutations(range(3))])
+    max_nonadaptive: float = max([nonadaptive_util(rv, n, order, k) for order in permutations(range(3))])
+    max_adaptive: float = max([max([adaptive_util(rv, n, order, k, t) for t in range(k)]) for order in permutations(range(3))])
     return max_adaptive / max_nonadaptive

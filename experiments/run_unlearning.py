@@ -316,14 +316,7 @@ if __name__=='__main__':
     init_m = None
     m = None
     for i in range(args.num_iters):
-        if args.non_adaptive:
-            # In the non-adaptive setting, we unlearn num_unlearned * i points from 
-            # the original training set on each iteration
-            num_unlearned = args.num_unlearned
-            # num_unlearned = args.num_unlearned * (i+1)
-        else:
-            # In the adaptive setting, we remove num_unlearned point on each iteration.
-            num_unlearned = args.num_unlearned
+        num_unlearned = args.num_unlearned
 
         print(f'Iteration {i}')
         if i == 0:

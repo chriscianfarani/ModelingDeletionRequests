@@ -1,0 +1,42 @@
+#!/bin/bash
+
+BASE_PARAMS="" # Add slurm paramters here (partition, resources, time, etc.)
+EXP=1
+
+if [[ $EXP -eq 1 ]]
+then
+    for requester in random lira loss shapley
+    do
+        for unlearn_method in retrain scrub relabel
+        do 
+            for i in 1 2 3 4
+            do
+                SLURM_PARAMS="$BASE_PARAMS"
+
+                # Nonadaptive requester
+                sbatch $SLURM_PARAMS --wrap "CUDA_LAUNCH_BLOCKING=1 uv run python run_unlearning.py $i --unlearn_type $requester --num_unlearned 1000 --num_iters 10 --num_epochs 50 --unlearn_method $unlearn_method --non_adaptive --no_model_save --suffix final_${requester}" 
+
+                # Adaptive requester
+                sbatch $SLURM_PARAMS --wrap "CUDA_LAUNCH_BLOCKING=1 uv run python run_unlearning.py $i --unlearn_type $requester --num_unlearned 1000 --num_iters 10 --num_epochs 50 --unlearn_method $unlearn_method --no_model_save --suffix final_${requester}" 
+            done
+        done
+    done
+elif [[ $EXP -eq 2 ]]
+then
+    for i in 1 2 3 4
+    do
+        SLURM_PARAMS="$BASE_PARAMS"
+
+        # Random requester
+        sbatch $SLURM_PARAMS --wrap "CUDA_LAUNCH_BLOCKING=1 uv run python run_unlearning.py $i --unlearn_type random --num_unlearned 1000 --num_iters 10 --num_epochs 50 --unlearn_method retrain --non_adaptive --no_model_save --suffix final_${requester}" 
+
+        # Shapley requester
+        sbatch $SLURM_PARAMS --wrap "CUDA_LAUNCH_BLOCKING=1 uv run python run_unlearning.py $i --unlearn_type shapley --num_unlearned 1000 --num_iters 10 --num_epochs 50 --unlearn_method retrain --non_adaptive --no_model_save --suffix final_${requester}" 
+
+        # Individual Shapley requester
+        sbatch $SLURM_PARAMS --wrap "CUDA_LAUNCH_BLOCKING=1 uv run python run_unlearning.py $i --unlearn_type masked_shapley --num_unlearned 1000 --num_iters 10 --num_epochs 50 --unlearn_method retrain --non_adaptive --no_model_save --suffix final_${requester}" 
+
+        # Adaptive Shapley requester
+        sbatch $SLURM_PARAMS --wrap "CUDA_LAUNCH_BLOCKING=1 uv run python run_unlearning.py $i --unlearn_type shapley --num_unlearned 1000 --num_iters 10 --num_epochs 50 --unlearn_method retrain --no_model_save --suffix final_${requester}" 
+    done
+fi
