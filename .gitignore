@@ -219,3 +219,4 @@ __marimo__/
 
 out/
 cifar10/
+*.swp
