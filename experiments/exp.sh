@@ -1,7 +1,7 @@
 #!/bin/bash
 
-BASE_PARAMS="" # Add slurm paramters here (partition, resources, time, etc.)
-EXP=1
+BASE_PARAMS="-p general  --gres gpu:1 --mem 64G -o ./out/slurm-%j.out --time 10:00:00" # Add slurm paramters here (partition, resources, time, etc.)
+EXP=3
 
 if [[ $EXP -eq 1 ]]
 then
@@ -39,4 +39,8 @@ then
         # Adaptive Shapley requester
         sbatch $SLURM_PARAMS --wrap "CUDA_LAUNCH_BLOCKING=1 uv run python run_unlearning.py $i --unlearn_type shapley --num_unlearned 1000 --num_iters 10 --num_epochs 50 --unlearn_method retrain --no_model_save --suffix final_${requester}" 
     done
+elif [[ $EXP -eq 3 ]]
+then
+        SLURM_PARAMS="$BASE_PARAMS"
+	sbatch $SLURM_PARAMS --wrap "CUDA_LAUNCH_BLOCKING=1 uv run python run_unlearning.py 1 --unlearn_type shapley --num_unlearned 1000 --num_iters 10 --num_epochs 50 --unlearn_method retrain --non_adaptive --no_model_save --suffix final_${requester}"
 fi

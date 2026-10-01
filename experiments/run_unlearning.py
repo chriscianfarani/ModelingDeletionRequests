@@ -11,6 +11,8 @@ import sklearn.metrics as metrics
 from argparse import ArgumentParser
 from tqdm import tqdm
 from pathlib import Path
+import tarfile
+import io
 
 import lira_attack
 from resnet import resnet18
@@ -127,7 +129,7 @@ def fill_lira_params(X, Y):
     subsets = {}
     tar: tarfile.TarFile = tarfile.open('./data/subsets.tar.gz', 'r:gz')
     for ind in logits:
-        f = tar.extractfile(f'./data/subsets/resnet18_50epochs_{ind}_updated.npy')
+        f = tar.extractfile(f'resnet18_50epochs_{ind}_updated.npy')
         if f is not None:
             subset = np.load(io.BytesIO(f.read()))
         else:
