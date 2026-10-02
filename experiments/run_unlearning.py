@@ -91,7 +91,7 @@ def get_cifar10_images(data_dir='./data/cifar10'):
     return X, Y, test_X, test_Y
 
 
-def load_cifar10(root_path, shuffle=True, batch_size=BATCH_SIZE, half_train=False):
+def load_cifar10(root_path, shuffle=True, batch_size=BATCH_SIZE, half_train=True):
     transform = transforms.Compose([
         transforms.ToTensor(), 
         transforms.Normalize((0.4914, 0.4822, 0.4465), (0.247, 0.243, 0.261))
