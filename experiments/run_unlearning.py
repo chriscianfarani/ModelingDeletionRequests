@@ -253,10 +253,8 @@ def retrain(m, retain_set, forget_set, num_epochs=NUM_EPOCHS):
 
 def compute_lira(m, train_inds, trainloader, mask=[]):
     y, pred, score = lira_attack.lira(m, train_inds, IN_MU, IN_STD, OUT_MU, OUT_STD, trainloader)
-    # valid_inds = ~(np.isinf(score) | np.isnan(score))
     mask_set = set(mask)
     valid_inds = [x for x in range(len(score)) if x not in mask_set]
-    # print('Valid inds: ', valid_inds.sum())
     auc = metrics.roc_auc_score(y[valid_inds], score[valid_inds] - 1)
     fpr, tpr, thresholds = metrics.roc_curve(y, score)
     fpr_ind = np.argmin(np.abs(fpr - 0.001))
@@ -266,11 +264,10 @@ def parse_args():
     parser = ArgumentParser()
     parser.add_argument('ind', type=int)
     parser.add_argument('--unlearn_type', choices=['random', 'loss', 'lira', 'shapley', 'min_shapley', 'masked_shapley'], default='loss')
-    parser.add_argument('--num_unlearned', type=int, default=500, help='Number of points to unlearn on each iteration')
+    parser.add_argument('--num_unlearned', type=int, default=1000, help='Number of points to unlearn on each iteration')
     parser.add_argument('--num_iters', type=int, default=10)
     parser.add_argument('--non_adaptive', action='store_true')
     parser.add_argument('--suffix', type=str, default='')
-    # parser.add_argument('--half_train', action='store_true', help='Start training models on half of dataset')
     parser.add_argument('--num_epochs', type=int, default=NUM_EPOCHS)
     parser.add_argument('--num_classes', type=int, default=10)
     parser.add_argument('--unlearn_method', type=str, choices=['retrain', 'scrub', 'relabel', 'saliency', 'sparse_unlearn'], default='retrain')
@@ -283,7 +280,7 @@ if __name__=='__main__':
     print(args)
     NUM_EPOCHS=args.num_epochs
 
-    # Get unlearning function function
+    # Get unlearning function
     if args.unlearn_method == 'retrain':
         unlearn_method = retrain
     else:
@@ -296,8 +293,8 @@ if __name__=='__main__':
     X, Y, test_X, test_Y = get_cifar10_images()
 
     # Compute LiRA parameters for training samples
-    # if args.unlearn_type == 'lira':
-    fill_lira_params(X, Y)
+    if args.unlearn_type == 'lira':
+        fill_lira_params(X, Y)
 
     # Create directories to save models parameters and training subsets/evaluations
     exp_dir = args.exp_dir
@@ -341,15 +338,10 @@ if __name__=='__main__':
             init_m = m
         loss = torch.nn.CrossEntropyLoss(reduce=False)(preds, Y)
 
-        scores, auc, tpr_at_fpr = compute_lira(m, train_inds, full_trainloader, mask=unlearn_inds)
-
         model_data = {
             'acc': accuracy,
-            'unlearn_pts': unlearn_inds,
-            'lira_90': np.quantile(scores, 0.9),
-            'lira_auc': auc,
-            'lira_tpr_at_0.1fpr': tpr_at_fpr
         }
+        print(f'Accuracy: {accuracy:0.3f}')
         
         save_data[i] = model_data
 
@@ -374,7 +366,7 @@ if __name__=='__main__':
             non_adaptive_str = '_nonadaptive'
         
         suffix = ''
-        if args.suffix:
+        if len(args.suffix) > 0:
             suffix = f'_{args.suffix}'
         
         if not args.no_model_save:

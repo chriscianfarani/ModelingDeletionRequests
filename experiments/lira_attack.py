@@ -32,7 +32,7 @@ def get_params(trained_models, subsets, X, Y, logits=None, flipped_logits=None):
     in_losses = [[] for _ in range(len(X))]
     out_losses = [[] for _ in range(len(X))]
     
-    for ind,subset in tqdm(subsets.items(), total=len(subsets)):
+    for ind,subset in subsets.items():
         subset_set = set(subset)
         for j in range(len(X)):
             if j in subset_set:
