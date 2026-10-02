@@ -29,8 +29,6 @@ def adaptive_util(rv, n: int, order: list[int], k: int, t: int) -> float:
 
     p_a: float = p[order[0]] * (rv.cdf(k)[order[0]] - rv.cdf(0)[order[0]])
 
-    # p_a_t: float = rv.cdf(t)[order[0]]
-
     prob: float = 0.
     for i in range(1,k+1):
         prob += rv.pmf(i)[order[1]] * (rv.cdf(k-i)[order[0]] - rv.cdf(min(k-i,t))[order[0]])
@@ -52,7 +50,6 @@ def adaptive_util(rv, n: int, order: list[int], k: int, t: int) -> float:
         for j in range(t+1):
             prob += rv.pmf(i)[order[1]] * rv.pmf(j)[order[0]] * rv.cdf(k-i-j)[order[2]]
     p_b2: float = p[order[1]] * prob
-    # return p_a + (1 - p_a_t) * (p_b1 + p_c1) + p_a_t * (p_b2 + p_c2)
     return p_a + (p_b1 + p_c1) + (p_b2 + p_c2)
 
 def adaptivity_gap(n: int, k: int, p: list[float]) -> float:
