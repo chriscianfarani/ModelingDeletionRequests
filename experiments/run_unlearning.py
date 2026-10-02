@@ -53,7 +53,6 @@ def train_model(m, train_subset=range(50000), num_epochs=NUM_EPOCHS, data_dir='.
     train, _ = load_cifar10_datasets(data_dir)
     trainset = torch.utils.data.Subset(train, train_subset)
     train_loader = DataLoader(trainset, batch_size=BATCH_SIZE, shuffle=True, num_workers=NUM_WORKERS, pin_memory=True)
-    # test_loader = DataLoader(test, batch_size=BATCH_SIZE, shuffle=False, num_workers=NUM_WORKERS, pin_memory=True)
     
     criterion = nn.CrossEntropyLoss()
     opt = SGD(m.parameters(), lr=LR, momentum=MOMENTUM, weight_decay=WEIGHT_DECAY)
@@ -151,7 +150,7 @@ def knn_sv(train_logits, train_labels, test_logits, test_labels, k=10):
     sorted_matrix = torch.sort(sims_matrix.T, descending=True).indices.to(device)
     vals[torch.arange(len(vals)),sorted_matrix[:,N-1].cpu()] = (test_labels == train_labels[sorted_matrix[:,N-1]])/N
 
-    for i in tqdm(range(N-2,-1,-1)):
+    for i in range(N-2,-1,-1):
         prev_vals = vals[torch.arange(len(vals)),sorted_matrix[:,i+1]]
         d1 = (test_labels == train_labels[sorted_matrix[:,i]]).float()
         d2 = (test_labels == train_labels[sorted_matrix[:,i+1]]).float()
@@ -341,8 +340,6 @@ if __name__=='__main__':
         model_data = {
             'acc': accuracy,
         }
-        print(f'Accuracy: {accuracy:0.3f}')
-        
         save_data[i] = model_data
 
         if args.non_adaptive:
@@ -372,4 +369,6 @@ if __name__=='__main__':
         if not args.no_model_save:
             torch.save(m, model_dir/f'resnet18_{args.num_unlearned}unlearn_{args.num_epochs}epochs_{args.unlearn_method}_{model_ind}_{i}{non_adaptive_str}{suffix}.pt')
         
-    torch.save(save_data, data_dir/f'resnet18_{args.num_unlearned}unlearn_{args.num_epochs}epochs_{args.unlearn_method}_{model_ind}{non_adaptive_str}{suffix}.pt')
+    outfile = data_dir/f'resnet18_{args.num_unlearned}unlearn_{args.num_epochs}epochs_{args.unlearn_method}_{model_ind}{non_adaptive_str}{suffix}.pt'
+    with open(outfile, 'w') as f:
+        json.dump(save_data, f)
