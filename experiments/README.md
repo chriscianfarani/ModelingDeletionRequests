@@ -15,3 +15,5 @@ Deletion Requesters:
 * LiRA
 * Shapley
 * Independent Shapley
+
+The data/ subdirectory contains logits extracted from shadow models used for computations of LiRA scores by the MIA requester, as well as the subsets of CIFAR-10 those shadow models were trained on.
