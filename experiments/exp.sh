@@ -43,5 +43,5 @@ elif [[ $EXP -eq 3 ]]
 then
     SLURM_PARAMS="$BASE_PARAMS"
 	# Single Shapley requester run
-	sbatch $SLURM_PARAMS --wrap "CUDA_LAUNCH_BLOCKING=1 uv run python run_unlearning.py 1 --unlearn_type shapley --num_unlearned 1000 --num_iters 10 --num_epochs 50 --unlearn_method retrain --non_adaptive --no_model_save --suffix ${requester}"
+	sbatch $SLURM_PARAMS --wrap "CUDA_LAUNCH_BLOCKING=1 uv run python run_unlearning.py 1 --unlearn_type shapley --num_unlearned 1000 --num_iters 10 --num_epochs 50 --unlearn_method retrain --non_adaptive --no_model_save --suffix shapley"
 fi
